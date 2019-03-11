@@ -1,5 +1,19 @@
-# ThunderCore Tutorial
+Running Dapp locally with local block chain
 
-This is the source code for the [DApp tutorial](https://www.thundercore.com/build-dapps-on-thundercore) for ThunderCore.
+```
+$ganache-cli # starts local blockchain
+```
+Restore MetaMask wallet from mnemonic pass phrase (ganache-cli will output this)
 
-You will need to set your mnemonic within `truffle.js` (or `truffle-config.js` if you're on Windows) to get this working
+Make sure latest smart contracts have been compiled and deployed (script for this soon to come)
+
+```
+$truffle compile #compile to json
+$truffle deploy --restart # deploy to local block chain
+```
+
+Start web server
+
+```
+$npm run start
+```
