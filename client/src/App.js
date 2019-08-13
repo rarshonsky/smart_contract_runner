@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Header, Divider, Form, Button, Segment } from 'semantic-ui-react'
 import TruffleContract from 'truffle-contract'
+import ReactTable from 'react-table'
 
 import getWeb3 from './utils/getWeb3'
 import KeyStoreContract from './contracts/KeyStore.json'
@@ -8,6 +9,27 @@ import KeyStoreContract from './contracts/KeyStore.json'
 import './App.css'
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-table/react-table.css'
+
+const columns =  [{
+   Header: 'First Name',
+   accessor: 'first_name',
+ }, {
+   Header: 'Last Name',
+   accessor: 'last_name',
+ }, {
+   Header: 'Type',
+   accessor: 'type',
+ }, {
+   Header: 'Key',
+   accessor: 'key',
+ }, {
+   Header: 'Verified',
+   accessor: 'verified',
+}, {
+  Header: 'Compromised',
+  accessor: 'compromised',
+}]
 
 
 class App extends Component {
@@ -20,8 +42,7 @@ class App extends Component {
     lastName: '',
     key: '',
     searchEmail: '',
-    resultName: '',
-    resultKey: ''
+    rows: []
   }
 
   componentDidMount() {
@@ -107,7 +128,7 @@ class App extends Component {
 
   handleSubmit = (ev) => {
     ev.preventDefault()
-    this.state.contract.addKey(this.state.email, this.state.firstName, this.state.lastName, this.state.key).then(() => {
+    this.state.contract.addKey(this.state.email, this.state.firstName, this.state.lastName, this.state.key, 'pgp').then(() => {
       alert('Key added!')
       window.location.reload()
     }).catch(err => {
@@ -117,25 +138,28 @@ class App extends Component {
 
   handleSearchSubmit = (ev) => {
     ev.preventDefault()
-    this.state.resultKey = ""
-    this.state.resultName = ""
-    this.state.contract.getName(this.state.searchEmail).then((e) => {
-      this.setState({
-        resultName: e,
+    let promises = [];
+    let i = 0;
+    for (i = 0; i < 10; ++i) {
+      let key_promise =  this.state.contract.getKey(this.state.searchEmail, i).then((e) => {
+        return JSON.parse(e)
       })
-      console.log(e)
-    }).catch(err => {
-      console.error(err)
-    })
+      promises.push(key_promise)
+    }
 
-    this.state.contract.getKey(this.state.searchEmail).then((e) => {
-      this.setState({
-        resultKey: e,
-      })
-      console.log(e)
-    }).catch(err => {
-      console.error(err)
-    })
+    Promise.all(promises)
+         .then((results) => {
+           results = results.filter(function (el) {
+            return Object.keys(el).length != 0;
+          });
+          this.setState({
+              rows: results
+          })
+           console.log("All done", results)
+         })
+         .catch((e) => {
+             // Handle errors here
+    });
   }
 
   render() {
@@ -158,7 +182,7 @@ class App extends Component {
         <Divider />
         <div>
           <Segment>
-            <Form onSubmit={this.handleSearchSubmit}>
+            <Form onSubmit={this.handleSearchSubmit.bind(this)}>
               <Form.Field>
                 <label>Email:</label>
                 <input value={this.state.search_email} onChange={this.handleChangeSearchEmail} />
@@ -170,7 +194,7 @@ class App extends Component {
         <Divider />
         <div>
           <Segment>
-            <Form onSubmit={this.handleSubmit}>
+            <Form onSubmit={this.handleSubmit.bind(this)}>
               <Form.Field>
                 <label>Email:</label>
                 <input value={this.state.email} onChange={this.handleChangeEmail} />
@@ -199,22 +223,12 @@ class App extends Component {
                 <Button type="button" className="close" data-dismiss="modal">&times;</Button>
               </div>
               <div className="modal-body">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th scope="col">#</th>
-                      <th scope="col">Name</th>
-                      <th scope="col">Key</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <th scope="row">1</th>
-                      <td>{this.state.resultName}</td>
-                      <td>{this.state.resultKey}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <ReactTable
+                  data={this.state.rows}
+                  columns={columns}
+                  className="-striped -highlight"
+                  showPagination={false}
+                />
               </div>
             </div>
 
@@ -223,7 +237,6 @@ class App extends Component {
       </div>
     )
   }
-
 }
 
 export default App
