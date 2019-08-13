@@ -42,7 +42,8 @@ class App extends Component {
     lastName: '',
     key: '',
     searchEmail: '',
-    rows: []
+    rows: [],
+    type: ''
   }
 
   componentDidMount() {
@@ -96,39 +97,15 @@ class App extends Component {
     })
   }
 
-  handleChangeFirstName = (ev) => {
-    this.setState({
-      firstName: ev.target.value,
-    })
-  }
-
-  handleChangeLastName = (ev) => {
-    this.setState({
-      lastName: ev.target.value,
-    })
-  }
-
-  handleChangeKey = (ev) => {
-    this.setState({
-      key: ev.target.value,
-    })
-  }
-
-  handleChangeEmail = (ev) => {
-    this.setState({
-      email: ev.target.value,
-    })
-  }
-
-  handleChangeSearchEmail = (ev) => {
-    this.setState({
-      searchEmail: ev.target.value,
-    })
+  handleChange = (ev) => {
+    let elements = {}
+    elements[ev.target.dataset['propName']] = ev.target.value
+    this.setState(elements)
   }
 
   handleSubmit = (ev) => {
     ev.preventDefault()
-    this.state.contract.addKey(this.state.email, this.state.firstName, this.state.lastName, this.state.key, 'pgp').then(() => {
+    this.state.contract.addKey(this.state.email, this.state.firstName, this.state.lastName, this.state.key, this.state.type).then(() => {
       alert('Key added!')
       window.location.reload()
     }).catch(err => {
@@ -185,7 +162,7 @@ class App extends Component {
             <Form onSubmit={this.handleSearchSubmit.bind(this)}>
               <Form.Field>
                 <label>Email:</label>
-                <input value={this.state.search_email} onChange={this.handleChangeSearchEmail} />
+                <input value={this.state.search_email} onChange={this.handleChange.bind(this)} data-prop-name= 'searchEmail'/>
               </Form.Field>
               <Button type="submit" className="btn btn-info btn-lg" data-toggle="modal" data-target="#searchResults">Search</Button>
             </Form>
@@ -197,19 +174,23 @@ class App extends Component {
             <Form onSubmit={this.handleSubmit.bind(this)}>
               <Form.Field>
                 <label>Email:</label>
-                <input value={this.state.email} onChange={this.handleChangeEmail} />
+                <input value={this.state.email} onChange={this.handleChange.bind(this)} data-prop-name= 'email'/>
               </Form.Field>
               <Form.Field>
                 <label>First Name:</label>
-                <input value={this.state.firstName} onChange={this.handleChangeFirstName} />
+                <input value={this.state.firstName} onChange={this.handleChange.bind(this)} data-prop-name = 'firstName'/>
               </Form.Field>
               <Form.Field>
                 <label>Last Name</label>
-                <input value={this.state.lastName} onChange={this.handleChangeLastName} />
+                <input value={this.state.lastName} onChange={this.handleChange.bind(this)} data-prop-name = 'lastName'/>
               </Form.Field>
               <Form.Field>
                 <label>Key:</label>
-                <input value={this.state.key} onChange={this.handleChangeKey} />
+                <input value={this.state.key} onChange={this.handleChange.bind(this)} data-prop-name= 'key' />
+              </Form.Field>
+              <Form.Field>
+                <label>Type:</label>
+                <input value={this.state.type} onChange={this.handleChange.bind(this)} data-prop-name = 'type'/>
               </Form.Field>
               <Button type='submit'>Add Key</Button>
             </Form>
