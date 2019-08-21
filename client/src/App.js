@@ -53,7 +53,7 @@ class App extends Component {
       token.setProvider(this.state.web3.currentProvider)
       token.defaults({from: accounts[0]})
 
-      token.deployed().then(contract => {
+      token.at('0x58E3Cf8AFb3ee89246e9AD74fDd2dFB5E7E9E1ab').then(contract => {
         this.setState({
           contract: contract,
           account: accounts[0],
