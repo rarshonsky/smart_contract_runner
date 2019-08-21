@@ -1,12 +1,12 @@
-const KeyStore = artifacts.require('KeyStore');
+const ABI = artifacts.require('ABI');
 
 module.exports = function(deployer) {
-  deployer.deploy(KeyStore);
+  deployer.deploy(ABI);
   deployer.then(function() {
   // Create a new version of A
-  return KeyStore.deployed();
+  return ABI.deployed();
 }).then(function(instance) {
-  abi = JSON.stringify(KeyStore.abi)
+  abi = JSON.stringify(ABI.abi)
   instance.setABI(abi);
   return instance;
 });
