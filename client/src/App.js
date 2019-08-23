@@ -96,6 +96,8 @@ class App extends Component {
           parse_abi = parse_abi.filter(function(method) { return method['constant'] === true });
           this.state.function_names = []
           parse_abi.map(function(e){this.state.function_names.push(e['name'])}.bind(this))
+          // e['name'] + '() => ' + e['outputs'][0]['type'])
+
           this.state.abi = parse_abi;
           this.setState({parse_abi: this.state.abi})
           this.setState({function_names: this.state.function_names})
@@ -105,7 +107,6 @@ class App extends Component {
   }
 
   handleSelectChange = (ev) => {
-    // 0x574145d19c3e33518dE2c95A947182901E2Ad021
     var index = ev.nativeEvent.target.selectedIndex;
     var fnum = parseInt(ev.nativeEvent.target[index].id);
     this.setState({inputs: this.state.parse_abi[fnum]["inputs"]});
@@ -175,7 +176,7 @@ class App extends Component {
                    <div id="display-data-Container">
                    <form onSubmit={this.handleContractCall.bind(this)}>
                        <select onChange={this.handleSelectChange.bind(this)}>
-                          {this.state.abi.map(function(fn, idx){return <option select={(idx == 0).toString()} data-name={fn['name']} id={idx}> {fn['name']} () </option>})}
+                          {this.state.abi.map(function(fn, idx){return <option select={(idx == 0).toString()} data-name={fn['name']} id={idx}> {fn['name']}() => {fn['outputs'][0]['type']} </option>})}
                        </select>
                       <div id="inputs">
                         <table>
