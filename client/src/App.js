@@ -99,34 +99,17 @@ class App extends Component {
           this.state.abi = parse_abi;
           this.setState({parse_abi: this.state.abi})
           this.setState({function_names: this.state.function_names})
-
-          // let moo = eval(contract_call).then(results => {
-          //   console.log(results);
-          //   return results;
-          // }).catch(err => {
-          //   console.error("error finding contracts: ", err);
-          // });
-          //
-          // Promise.all([moo])
-          //      .then((results) => {
-          //       this.setState({
-          //           contract_result: results
-          //       })
-          //        console.log("All done", results)
-          //      })
-          //      .catch((e) => {
-          //          // Handle errors here
-          // });
-
-          // debugger;
+          this.setState({sel_fn: this.state.function_names[0]})
       }
     }.bind(this));
   }
 
   handleSelectChange = (ev) => {
+    // 0x574145d19c3e33518dE2c95A947182901E2Ad021
     var index = ev.nativeEvent.target.selectedIndex;
     var fnum = parseInt(ev.nativeEvent.target[index].id);
     this.setState({inputs: this.state.parse_abi[fnum]["inputs"]});
+    this.setState({sel_fn: ev.target[index].dataset['name']})
   }
 
   handleContractCall = (ev) => {
@@ -141,8 +124,9 @@ class App extends Component {
     inputs.push(val)
 
   }.bind(this))
-    var contract_call = 'this.state.nc.' + this.state.type + '(' + inputs.join(',') + ')';
-    debugger;
+    inputs.push('function(e,r){this.setState({contract_result: r});}.bind(this)');
+    var contract_call = 'this.state.nc.' + this.state.sel_fn + '.call(' + inputs.join(',') + ')';
+    eval(contract_call);
   }
 
   render() {
@@ -176,21 +160,29 @@ class App extends Component {
         </div>
 
         <div id="contractResults" className="fade modal" role="dialog">
-          <div className="modal-dialog">
+          <div className="modal-dialog modal-lg">
             <div className="modal-content">
               <div className="modal-header">
                 <h4 className="modal-title">Contract Info</h4>
                 <Button type="button" className="close" data-dismiss="modal">&times;</Button>
               </div>
               <div className="modal-body">
-                   <input value={this.state.contract_result || ''} disabled />
+                  <label>
+                    Contract Call Results
+                    <textarea rows="20" cols="100" value={this.state.contract_result || ''} disabled />
+                  </label>
+
                    <div id="display-data-Container">
                    <form onSubmit={this.handleContractCall.bind(this)}>
                        <select onChange={this.handleSelectChange.bind(this)}>
-                          {this.state.abi.map(function(fn, idx){return <option name={fn['name']} id={idx}> {fn['name']} () </option>})}
+                          {this.state.abi.map(function(fn, idx){return <option select={(idx == 0).toString()} data-name={fn['name']} id={idx}> {fn['name']} () </option>})}
                        </select>
                       <div id="inputs">
-                          {this.state.inputs.map(function(foo, idx){return <label>{foo['name']}({foo['type']}) <input type="text" data-type= {foo['type']} name={foo['name']} ref={'input' + idx}/></label> })}
+                        <table>
+                          <tbody>
+                            {this.state.inputs.map(function(input_attr, idx){return <tr><td><label>{input_attr['name']}({input_attr['type']})</label></td><td><input type="text" data-type= {input_attr['type']} name={input_attr['name']} ref={'input' + idx} required/></td></tr>})}
+                          </tbody>
+                        </table>
                       </div>
                         <Button type="submit" className="btn btn-info btn-lg">Call Contract</Button>
                    </form>

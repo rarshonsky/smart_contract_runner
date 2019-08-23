@@ -13,5 +13,12 @@
 
 .wb  {
   word-break: break-word;
+}
 
+#inputs {
+  display: inline-grid;
+}
+
+table {
+  margin: 10px;
 }
