@@ -22,3 +22,24 @@
 table {
   margin: 10px;
 }
+
+#main {
+  background-image: url("images/blockchain-interaction.jpg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  background-color: black;
+}
+
+.ui.header.name {
+  color: white;
+}
+
+.ui.header.white {
+  color: white;
+}
+
+#contract-address, #contract-button {
+  min-width: 50ch;
+}
